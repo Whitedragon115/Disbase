@@ -1,0 +1,22 @@
+{
+  "name": "disbase",
+  "version": "1.0.0",
+  "description": "a discord database for ever",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "discrod",
+    "database",
+    "discord",
+    "database",
+    "free",
+    "space"
+  ],
+  "author": "dragoncoder",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/builders": "^1.7.0"
+  }
+}
