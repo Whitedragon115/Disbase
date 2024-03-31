@@ -45,7 +45,6 @@ module.exports = {
             let foundImageOrVideo = false;
             message.attachments.forEach(attachment => {
                 if (attachment.contentType.startsWith('image/') || attachment.contentType.startsWith('video/')) {
-                    // 附件是图像或视频，设置标志为true
                     foundImageOrVideo = true;
                 }
             });
@@ -69,7 +68,7 @@ module.exports = {
 
         const picfile = Array.from(message.attachments.values());
         const customname = message.content.slice(1, -1).split('/');
-        if (picfile.length <= customname.length) {
+        if (picfile.length < customname.length) {
             const msg = await message.reply(`圖片數量與註解數量不符合\n> 你的訊息在${await create(10, 'RELATIVE')}秒後會被刪除`)
             return setTimeout(() => {
                 msg.delete();
@@ -81,13 +80,13 @@ module.exports = {
         handleImageUpload(0);
 
 
-        const msg = await message.reply('圖片已上傳，請稍後\n');
+        const msg = await message.reply({ content: '圖片已上傳，請稍後\n> 你的訊息在' + await create(picfile.length + 1, 'RELATIVE') + '秒後會被刪除', allowedMentions: { repliedUser: false } });
         setTimeout(() => {
             message.delete();
             msg.delete();
-        }, 5000);
+        }, picfile.length * 1000);
 
-// ====================[ Function ]=====================
+        // ====================[ Function ]=====================
         async function handleImageUpload(index) {
             if (index >= picfile.length) {
                 return;
@@ -97,11 +96,14 @@ module.exports = {
             const slink = await shortlink(currentPic.proxyURL, "", false);
             const embed = new EmbedBuilder()
                 .setTitle("新的圖片已上傳")
-                .setDescription(`圖寬：\`${currentPic.width}\` **|** 圖高：\`${currentPic.height}\` **|** 檔名：\`${currentPic.name}\``)
+                .setDescription(`**檔名：**\`${currentPic.name}\``)
                 .addFields(
+                    { name: '圖高  ×  圖寬', value: `\`${currentPic.height}\`  **×**  \`${currentPic.width}\``, inline: true },
+                    { name: '圖片大小', value: `${(currentPic.size / (1024 * 1024)).toFixed(2)} MB`, inline: true },
+                    { name: '縮短連結', value: `\`\`\`${slink.link}\`\`\`` },
                     { name: '創建時間', value: `> <t:${slink.time}:R>`, inline: true },
                     { name: '連結轉換', value: "> 無", inline: true },
-                    { name: '連結', value: `\`\`\`${slink.link}\`\`\`` }
+                    { name: '原始連結', value: `> [點我](${currentPic.proxyURL})`, inline: true }
                 )
                 .setFooter({
                     text: '註解：' + (customname[index] ? customname[index] : "無註解"),
@@ -111,10 +113,14 @@ module.exports = {
                 .setTimestamp()
                 .setColor(0x00ff00);
 
+            if(currentPic.contentType.startsWith('video/')){
+                embed.setThumbnail("https://cdn2.iconfinder.com/data/icons/custom-ios-14-1/60/Zoom-64.png");
+            }
+
             opchannel.send({ embeds: [embed] });
             setTimeout(() => {
                 handleImageUpload(index + 1);
-            }, 2000);
+            }, 500);
         }
     }
 }
