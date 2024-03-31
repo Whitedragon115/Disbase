@@ -80,7 +80,7 @@ module.exports = {
 
         const embed = new EmbedBuilder()
             .setTitle('檔案上傳中')
-            .setDescription(`檔案已上傳，請稍後\n> 你的訊息在${await create(attachments.length + 1, 'RELATIVE')}秒後會被刪除`)
+            .setDescription(`檔案已上傳，請稍後\n> 你的訊息在${await create(attachments.length*2 + 1, 'RELATIVE')}秒後會被刪除`)
             .setFields(
                 { name: '上傳數量', value: '總計 `' + attachments.length + '` 個', inline: true },
                 { name: '總共大小', value: totalSize, inline: true }
@@ -92,7 +92,7 @@ module.exports = {
         setTimeout(() => {
             message.delete();
             msg.delete();
-        }, attachments.length * 1000);
+        }, attachments.length * 2000);
 
         // ====================[ Function ]=====================
         async function handleImageUpload(index) {
@@ -101,7 +101,7 @@ module.exports = {
             }
 
             const currentAttachment = attachments[index];
-            const shortLink = await shortlink(currentAttachment.proxyURL, "", false);
+            const shortLink = await shortlink(currentAttachment.url, "", false);
             const embed = new EmbedBuilder()
                 .setTitle("新的圖片已上傳")
                 .setDescription(`**檔名：**\`${currentAttachment.name}\``)
@@ -111,7 +111,7 @@ module.exports = {
                     { name: '縮短連結', value: `\`\`\`${shortLink.link}\`\`\`` },
                     { name: '創建時間', value: `> <t:${shortLink.time}:R>`, inline: true },
                     { name: '連結轉換', value: "> 無", inline: true },
-                    { name: '原始連結', value: `> [點我](${currentAttachment.proxyURL})`, inline: true }
+                    { name: '原始連結', value: `> [點我](${currentAttachment.url})`, inline: true }
                 )
                 .setFooter({
                     text: '註解：' + (annotations[index] ? annotations[index] : "無註解"),
