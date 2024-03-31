@@ -5,7 +5,7 @@ module.exports = {
     name: Events.ClientReady,
     once: true,
     execute(client) {
-        client.user.setActivity({ name: 'MLGRush Network', type: 3 });
+        client.user.setActivity({ name: 'discord', type: 3 });
 
         console.log(`\x1B[32mLogin : Bot \x1B[33m${client.user.tag}\n\x1B[32mBotID : \x1B[33m${clientId}\x1B[0m`);
         console.log(`\x1B[32mServerID : \x1B[33m${guildId}`);

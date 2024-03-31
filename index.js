@@ -1,10 +1,17 @@
-//upload sussec?
 const fs = require('node:fs');
-const path = require('node:path');
+const path = require('path');
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
+require('dotenv').config();
 
-const { token } = require('./config.json');
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers] });
+const client = new Client({
+	intents: [
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMembers,
+		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.MessageContent,
+
+	]
+});
 
 console.log('\x1B[37m===============================================\x1B[0m')
 //====================================
@@ -30,6 +37,7 @@ for (const folder of commandFolders) {
 }
 console.log(`\x1B[37m-----------Load total [${c_count}] commands-----------\x1B[0m`)
 //====================================
+
 const eventsPath = path.join(__dirname, 'events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
@@ -50,9 +58,9 @@ for (const file of unityFiles) {
 	const filePath = path.join(unityPath, file);
 	const event = require(filePath);
 	if (event.once) {
-		client.once(event.name, (...args) => event.execute(...args));
+		client.once(event.name, (...args) => event.execute(...args, client));
 	} else {
-		client.on(event.name, (...args) => event.execute(...args));
+		client.on(event.name, (...args) => event.execute(...args, client));
 	}
 }
 //=====================================
@@ -81,4 +89,10 @@ for (const folder of actionFolders) {
 console.log(`\x1B[37m-----------Load total[${a_count}] trigger event-----------\x1B[0m`)
 console.log('\x1B[37m============================\x1B[0m')
 //====================================
-client.login(token);
+client.login(process.env.TOKEN);
+
+
+
+
+
+
