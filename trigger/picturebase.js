@@ -3,8 +3,6 @@ const { Events } = require('discord.js');
 const { create } = require('discord-timestamps')
 const { PicInputChannel, output } = require('../config.json');
 const { checklink, shortlink } = require('../function/shotelink.js');
-const interactionCreate = require('../events/interactionCreate');
-
 module.exports = {
     name: Events.MessageCreate,
     async execute(message, client) {
@@ -41,28 +39,29 @@ module.exports = {
                 message.delete();
                 msg.delete();
             }, 5000);
-        } else {
-            let foundImageOrVideo = false;
-            message.attachments.forEach(attachment => {
-                if (attachment.contentType.startsWith('image/') || attachment.contentType.startsWith('video/')) {
-                    foundImageOrVideo = true;
-                }
-            });
-
-            if (!foundImageOrVideo) {
-                const embed = new EmbedBuilder()
-                    .setTitle('請傳送圖片或影片')
-                    .setDescription('在這個頻道中請輸入圖片或影片才能發送圖片連結喔')
-                    .setColor(0xff0000)
-                    .setTimestamp();
-
-                const msg = await message.reply({ embeds: [embed] });
-                return setTimeout(() => {
-                    message.delete();
-                    msg.delete();
-                }, 5000);
-            }
         }
+
+        let foundImageOrVideo = true;
+        await message.attachments.forEach(attachment => {
+            if (!attachment.contentType.startsWith('image/') && !attachment.contentType.startsWith('video/')) {
+                foundImageOrVideo = false;
+            }
+        });
+
+        if (!foundImageOrVideo) {
+            const embed = new EmbedBuilder()
+                .setTitle('請傳送圖片或影片')
+                .setDescription('你的檔案中可能包含了非圖片影片的檔案，在這個頻道中請傳送圖片或影片才能紀錄圖片連結喔')
+                .setColor(0xff0000)
+                .setTimestamp();
+
+            const msg = await message.reply({ embeds: [embed] });
+            return setTimeout(() => {
+                message.delete();
+                msg.delete();
+            }, 5000);
+        }
+
 
 
 
@@ -111,9 +110,9 @@ module.exports = {
                 })
                 .setThumbnail(currentPic.url)
                 .setTimestamp()
-                .setColor(0x00ff00);
+                .setColor(0x7aff7a);
 
-            if(currentPic.contentType.startsWith('video/')){
+            if (currentPic.contentType.startsWith('video/')) {
                 embed.setThumbnail("https://cdn2.iconfinder.com/data/icons/custom-ios-14-1/60/Zoom-64.png");
             }
 

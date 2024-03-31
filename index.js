@@ -1,6 +1,7 @@
 const fs = require('node:fs');
 const path = require('path');
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
+const { QuickDB } = require('quick.db');
 require('dotenv').config();
 
 const client = new Client({
@@ -12,6 +13,8 @@ const client = new Client({
 
 	]
 });
+
+client.db = new QuickDB();
 
 console.log('\x1B[37m===============================================\x1B[0m')
 //====================================
@@ -45,9 +48,9 @@ for (const file of eventFiles) {
 	const filePath = path.join(eventsPath, file);
 	const event = require(filePath);
 	if (event.once) {
-		client.once(event.name, (...args) => event.execute(...args));
+		client.once(event.name, (...args) => event.execute(...args, client));
 	} else {
-		client.on(event.name, (...args) => event.execute(...args));
+		client.on(event.name, (...args) => event.execute(...args, client));
 	}
 }
 //====================================
